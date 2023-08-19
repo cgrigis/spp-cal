@@ -1,10 +1,109 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Génération de calendrier pour les shifts — La Fève</title>
+        <title>Génération de calendrier ABCD pour les shifts — La Fève</title>
+        <script src="/lib/htmx"></script>
+        <style>
+            body {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                background-color: lightgray;
+            }
+
+            div#main {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 95%;
+            }
+
+            div#form {
+                display: flex;
+                flex-direction: column;
+                gap: 1em;
+            }
+
+            div#form-inputs {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 1em;
+            }
+
+            div#form-year {
+                display: flex;
+                flex-direction: row;
+                gap: 0.3em;
+            }
+
+            div#form-week-id {
+                display: flex;
+                flex-direction: row;
+            }
+
+            div#form-buttons {
+                display: flex;
+                flex-direction: row;
+                gap: 10%;
+            }
+
+            hr {
+                width: 95%;
+            }
+
+            button {
+                flex: 1 auto;
+            }
+        </style>
     </head>
 
     <body>
-        <h1>Hello world!</h1>
+        <div id="main">
+            <h1>Génération de calendrier ABCD</h1>
+
+            <form>
+                <div id="form">
+                    <div id="form-inputs">
+                        <div id="form-year">
+                            <label for="year">Année:</label>
+                            <select id="year" name="year">
+                                {% for year in range(current_year - 3, current_year + 4) %}
+                                <option value="{{ year }}"
+                                        {% if year == current_year %} selected {% endif %}>
+                                    {{ year }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div id="form-week-id">
+                            <label>Semaine de premier shift:</label>
+                            <input type="radio" id="week_id_a" name="week_id" value="0" checked>
+                            <label for="week_id_a">A</label>
+                            &nbsp;
+                            <input type="radio" id="week_id_b" name="week_id" value="1">
+                            <label for="week_id_b">B</label>
+                            &nbsp;
+                            <input type="radio" id="week_id_c" name="week_id" value="2">
+                            <label for="week_id_c">C</label>
+                            &nbsp;
+                            <input type="radio" id="week_id_d" name="week_id" value="3">
+                            <label for="week_id_d">D</label>
+                        </div>
+                    </div>
+
+                    <div id="form-buttons">
+                        <button hx-post="/cal/svg" hx-target="#calendar-div">Générer</button>
+                        <button hx-post="/cal/download" hx-target="">Télécharger</button>
+                    </div>
+                </div>
+            </form>
+
+            <hr/>
+
+            <div id="calendar-div"/>
+
+        </div>
     </body>
 </html>
