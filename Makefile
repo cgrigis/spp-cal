@@ -2,7 +2,7 @@ all: calendar
 
 .ONESHELL:
 
-SRC = gen_spp_cal.py serve_calendar.py
+SRC = gen_spp_cal.py serve_calendar.py templates/index.html
 
 PYTEST_OPTIONS := -v
 VENV_DIR := venv
@@ -36,5 +36,5 @@ clean:
 	rm -rf $(VENV_DIR)
 
 .PHONY: docker
-docker: $(SRC) Dockerfile
-	docker build --file Dockerfile --tag spp-cal .
+docker: $(SRC) Dockerfile docker-compose.yaml
+	docker-compose build

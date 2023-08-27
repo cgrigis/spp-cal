@@ -1,23 +1,26 @@
-To generate pdf:
+Run on command line:
+```
+$ make env
+$ . ./venv/bin/activate
+$ ./gen_spp_cal.py --help
+$ ./gen_spp_cal.py --year 2023 --start-shift A --filename my_cal.svg
+```
+
+Generate pdf:
 
 ```
-$ rsvg-convert --format pdf calendar.svg > calendar.pdf
+$ rsvg-convert --format pdf my_cal.svg > my_cal.pdf
 ```
 
 or:
 ```
-$ convert -page A4+0+0 calendar.svg calendar.pdf
+$ convert -page A4+0+0 my_cal.svg my_cal.pdf
 ```
 
-Docker:
+Run from Docker:
 ```
 $ docker-compose build
-$ docker-compose up -d
+$ docker run --publish <local-port>:8000 cgrigis/spp-cal
 ```
 
-Get the container IP:
-```
-$ docker network inspect calendar_default | jq '.[0].Containers[].IPv4Address'
-```
-
-The app is then accessible as `<IP>:8000/cal?year=<YEAR>&week_id=<WEEK_ID>`.
+The app is then accessible on `http://localhost:<local-port>/`.
