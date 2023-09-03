@@ -6,10 +6,19 @@ import svgwrite
 import holidays
 
 
+SPP_EPOCH = datetime.date(2020, 1, 1)
+SPP_EPOCH_WEEK_ID = 3  # Week 'D'
+
 def year_info(year):
     d = datetime.date(year, 1, 1)
 
     week_day = d.weekday()
+
+    weeks_since_epoch, days_offset = divmod((d - SPP_EPOCH).days, 7)
+    week_id = (SPP_EPOCH_WEEK_ID + weeks_since_epoch) % 4
+    if SPP_EPOCH.weekday() + days_offset > 6:  # Shift onto next week
+        week_id = (week_id + 1) % 4
+
     days_per_month = []
 
     month, day = 1, 1
@@ -24,7 +33,7 @@ def year_info(year):
 
     hol = holidays.CountryHoliday("CH", years=[year], prov="GE")
 
-    return week_day, days_per_month, hol
+    return week_day, days_per_month, hol, week_id
 
 
 def week_color(week_id):
@@ -95,7 +104,7 @@ M_W, M_H = C_W / 6, (C_H - CT_H) / 2
 D_W, D_H = M_W, (M_H - MT_H) / 31
 
 
-def gen_calendar(year, week_id):
+def gen_calendar(year):
     dwg = svgwrite.Drawing(size=(W, H))
 
     main_grp = dwg.add(
@@ -124,14 +133,13 @@ def gen_calendar(year, week_id):
     cal_grp = main_grp.add(dwg.g(id="calendar", stroke="black"))
     cal_grp.translate((0, CT_H))
 
-    week_day, days_per_month, hol = year_info(year)
+    week_day, days_per_month, hol, week_id = year_info(year)
 
     # La Feve is open on December 31st, if it is normally an open day
     dec_31 = datetime.date(year, 12, 31)
     if dec_31.weekday() not in (0, 6):
         del hol[dec_31]
 
-    work_day_seen = False
     for month in range(12):
         row, column = month // 6, month % 6
 
@@ -213,7 +221,6 @@ def gen_calendar(year, week_id):
                         text_anchor="middle",
                     )
                 )
-                work_day_seen = True
 
             day_grp = days_grp.add(
                 dwg.g(
@@ -258,7 +265,7 @@ def gen_calendar(year, week_id):
                 day_cell_grp.add(cell_text)
 
             week_day = (week_day + 1) % 7
-            if week_day == 0 and work_day_seen:
+            if week_day == 0:
                 week_id = (week_id + 1) % 4
 
         month_rect = dwg.rect(
@@ -290,14 +297,6 @@ if __name__ == "__main__":
         help="year for which to generate the calendar",
     )
     parser.add_argument(
-        "--start-shift",
-        "-s",
-        type=str,
-        choices=["A", "B", "C", "D"],
-        default="A",
-        help="shift for the first week",
-    )
-    parser.add_argument(
         "--filename",
         "-f",
         type=str,
@@ -307,8 +306,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    week_id = ord(args.start_shift) - ord("A")
-    svg = gen_calendar(args.year, week_id)
+    svg = gen_calendar(args.year)
 
     filename = args.filename.format(year=args.year)
     with open(filename, 'w', encoding="utf-8") as f:

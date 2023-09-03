@@ -3,6 +3,7 @@
     <head>
         <title>Génération de calendrier ABCD pour les shifts — La Fève</title>
         <script src="/lib/htmx"></script>
+        <script src="/lib/htmx-ext-reponse-targets"></script>
         <style>
             body {
                 display: flex;
@@ -21,6 +22,7 @@
             div#form {
                 display: flex;
                 flex-direction: column;
+                align-items: center;
                 gap: 1em;
             }
 
@@ -45,6 +47,7 @@
             div#form-buttons {
                 display: flex;
                 flex-direction: row;
+                align-items: center;
                 gap: 10%;
             }
 
@@ -59,7 +62,7 @@
     </head>
 
     <body>
-        <div id="main">
+        <div id="main" hx-ext="response-targets">
             <h1>Génération de calendrier ABCD</h1>
 
             <form>
@@ -76,33 +79,18 @@
                                 {% endfor %}
                             </select>
                         </div>
-
-                        <div id="form-week-id">
-                            <label>Semaine de premier shift:</label>
-                            <input type="radio" id="week_id_a" name="week_id" value="0" checked>
-                            <label for="week_id_a">A</label>
-                            &nbsp;
-                            <input type="radio" id="week_id_b" name="week_id" value="1">
-                            <label for="week_id_b">B</label>
-                            &nbsp;
-                            <input type="radio" id="week_id_c" name="week_id" value="2">
-                            <label for="week_id_c">C</label>
-                            &nbsp;
-                            <input type="radio" id="week_id_d" name="week_id" value="3">
-                            <label for="week_id_d">D</label>
-                        </div>
                     </div>
 
                     <div id="form-buttons">
-                        <button hx-post="/cal/svg" hx-target="#calendar-div">Générer</button>
-                        <button hx-post="/cal/download" hx-target="">Télécharger</button>
+                        <button hx-post="/cal/svg" hx-target="#calendar-div" hx-target-400="#calendar-div">Générer</button>
+                        <button hx-post="/cal/download" hx-target="" hx-target-400="#calendar-div">Télécharger</button>
                     </div>
                 </div>
             </form>
 
             <hr/>
 
-            <div id="calendar-div"/>
+            <div id="calendar-div"></div>
 
         </div>
     </body>

@@ -43,6 +43,17 @@ logger = logging.getLogger(__name__)
 app = Quart(__name__)
 
 
+def validate_args(args):
+    try:
+        year = int(args['year'])
+        if year < 2020:
+            raise ValueError("Year should be >= 2020")
+    except ValueError as exc:
+        logger.info(f"Invalid arguments: {exc}")
+        raise
+
+    return (year, )
+
 @app.route("/", methods=["GET"])
 async def index():
     current_year = datetime.datetime.now().year
@@ -52,9 +63,12 @@ async def index():
 @app.route("/cal/svg", methods=["POST"])
 async def gen_cal_svg():
     args = await request.values
-    year, week_id = int(args['year']), int(args['week_id'])
+    try:
+        (year, ) = validate_args(args)
+    except ValueError as exc:
+        return f"Invalid arguments: {exc}", 400
 
-    svg_data = gen_calendar(year, week_id)
+    svg_data = gen_calendar(year)
 
     response = await send_file(
             io.BytesIO(svg_data.encode('utf8')),
@@ -66,19 +80,25 @@ async def gen_cal_svg():
 @app.route("/cal/download", methods=["POST"])
 async def redirect_to_pdf():
     args = await request.values
-    year, week_id = int(args['year']), int(args['week_id'])
+    try:
+        (year, ) = validate_args(args)
+    except ValueError as exc:
+        return f"Invalid arguments: {exc}", 400
 
     response = await make_response("")
-    response.headers['HX-Redirect'] = f"/cal/pdf?year={year}&week_id={week_id}"
+    response.headers['HX-Redirect'] = f"/cal/pdf?year={year}"
 
     return response
 
 @app.route("/cal/pdf", methods=["GET"])
 async def gen_cal_pdf():
     args = await request.values
-    year, week_id = int(args['year']), int(args['week_id'])
+    try:
+        (year, ) = validate_args(args)
+    except ValueError as exc:
+        return f"Invalid arguments: {exc}", 400
 
-    svg_data = gen_calendar(year, week_id)
+    svg_data = gen_calendar(year)
 
     with tempfile.TemporaryDirectory() as tmpdirname:
         with open(os.path.join(tmpdirname, "cal.svg"), 'w', encoding='utf-8') as f:
@@ -107,3 +127,9 @@ async def serve_htmx():
     lib_dir = os.path.join(app.root_path, "lib")
 
     return await send_from_directory(lib_dir, "htmx.min.js")
+
+@app.route("/lib/htmx-ext-reponse-targets", methods=["GET"])
+async def serve_htmx_ext_response_targets():
+    lib_dir = os.path.join(app.root_path, "lib")
+
+    return await send_from_directory(lib_dir, "response-targets.js")
