@@ -31,4 +31,4 @@ jobs:
           docker login
           --username ${{ secrets.DOCKER_USERNAME }}
           --password ${{ secrets.DOCKER_PASSWORD }} &&
-          docker push -a spp-cal
+          docker push -a cgrigis/spp-cal
