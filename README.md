@@ -5,7 +5,7 @@
 $ make env
 $ . ./venv/bin/activate
 $ ./gen_spp_cal.py --help
-$ ./gen_spp_cal.py --year 2023 --start-shift A --filename my_cal.svg
+$ ./gen_spp_cal.py --year 2023 --filename my_cal.svg
 ```
 
 ## Generate pdf:
