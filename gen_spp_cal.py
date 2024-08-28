@@ -86,6 +86,7 @@ def holiday_fr(name_de):
         "Nationalfeiertag": "Fête nationale",
         "Weihnachten": "Noël",
         "Wiederherstellung der Republik": "Rest. République",
+        "Genfer Bettag": "Jeûne genevois",
     }.get(name_de, name_de)
 
 
