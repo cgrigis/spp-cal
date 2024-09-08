@@ -11,8 +11,6 @@ services:
       - hypercorn
       - --bind
       - 0.0.0.0:8000
-        #      - --root-path
-        #      - /incubator/garfield/demo
       - /home/serve_calendar:app
 
     restart: unless-stopped
@@ -21,6 +19,3 @@ services:
 
     expose:
       - 8000
- #     ports:
- #       - "1103:8000"
-
