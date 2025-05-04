@@ -1,3 +1,3 @@
-holidays==0.55
+holidays==0.71
 svgwrite==1.4.3
-quart==0.19.6
+Quart==0.20.0

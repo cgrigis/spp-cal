@@ -31,7 +31,10 @@ def year_info(year):
 
         month, day = d.month, d.day
 
-    hol = holidays.CountryHoliday("CH", years=[year], prov="GE")
+    hol = holidays.country_holidays(country="CH", years=[year], subdiv="GE", language='fr')
+    # The following are not listed for Switzerland for some reason
+    hol._add_easter_sunday("Pâques")
+    hol._add_whit_sunday("Pentecôte")
 
     return week_day, days_per_month, hol, week_id
 
@@ -72,22 +75,6 @@ def day_name(week_day):
         "Samedi",
         "Dimanche",
     ][week_day]
-
-
-def holiday_fr(name_de):
-    return {
-        "Neujahrestag": "Nouvel An",
-        "Pfingsten": "Pentecôte",
-        "Karfreitag": "Vendredi Saint",
-        "Ostern": "Pâques",
-        "Ostermontag": "Lundi de Pâques",
-        "Auffahrt": "Ascension",
-        "Pfingstmontag": "Lun. de Pentecôte",
-        "Nationalfeiertag": "Fête nationale",
-        "Weihnachten": "Noël",
-        "Wiederherstellung der Republik": "Rest. République",
-        "Genfer Bettag": "Jeûne genevois",
-    }.get(name_de, name_de)
 
 
 def week_shift(week_id):
@@ -207,7 +194,7 @@ def gen_calendar(year):
                 if holiday:
                     cell_texts.append(
                         dwg.text(
-                            holiday_fr(holiday),
+                            holiday,
                             insert=(5, D_H * 0.7),
                             font_size=D_H * 0.5,
                         )
